@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>¿Cuánto sabés de cooperadoras?</title>
+<meta name="description" content="Juego de preguntas y respuestas sobre cooperadoras escolares de la Provincia de Buenos Aires.">
+<style>
+  :root{
+    --azul:#1F5FA8; --azul-osc:#16365C; --celeste:#E8F1FB; --amarillo:#E9B949; --amarillo-cl:#FFF6DA;
+    --verde:#1E8A4C; --verde-cl:#E3F5EA; --rojo:#C0392B; --rojo-cl:#FCE8E6;
+    --texto:#2E2E2E; --suave:#6B7280; --fondo:#F4F6F9; --tarjeta:#FFFFFF; --borde:#D9DEE6;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --azul:#4A8BD6; --azul-osc:#BFD8F5; --celeste:#1B2A3D; --amarillo-cl:#3A3218;
+      --verde-cl:#16321F; --rojo-cl:#3A1C19; --verde:#4CC27C; --rojo:#F07A6A;
+      --texto:#E8EAED; --suave:#A3ABB8; --fondo:#11161D; --tarjeta:#1A212B; --borde:#2E3846;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:var(--fondo);color:var(--texto);line-height:1.5;min-height:100vh}
+  header{background:#1F5FA8;color:#fff;padding:22px 16px 20px;border-bottom:4px solid var(--amarillo)}
+  header .wrap{max-width:720px;margin:0 auto}
+  header small{letter-spacing:.08em;opacity:.85;font-size:.78rem}
+  header h1{margin:4px 0 0;font-size:1.6rem;line-height:1.2}
+  main{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+  .card{background:var(--tarjeta);border:1px solid var(--borde);border-radius:14px;padding:22px;
+        box-shadow:0 2px 10px rgba(0,0,0,.05)}
+  h2{color:var(--azul-osc);margin:0 0 8px;font-size:1.3rem}
+  p{margin:.4em 0}
+  .muted{color:var(--suave)}
+  .btn{appearance:none;border:0;border-radius:10px;padding:13px 18px;font-size:1rem;font-weight:600;
+       cursor:pointer;background:var(--azul);color:#fff;transition:transform .08s,filter .15s}
+  .btn:hover{filter:brightness(1.08)} .btn:active{transform:scale(.98)}
+  .btn.sec{background:transparent;color:var(--azul);border:2px solid var(--azul)}
+  .btn:focus-visible,.opt:focus-visible,.chip:focus-visible{outline:3px solid var(--amarillo);outline-offset:2px}
+  .modos{display:grid;gap:10px;margin:16px 0 6px}
+  .modo{display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left;width:100%;
+        background:var(--celeste);color:var(--texto);border:2px solid transparent;border-radius:12px;padding:14px 16px;
+        cursor:pointer;font-size:1rem}
+  .modo:hover{border-color:var(--azul)}
+  .modo b{display:block;color:var(--azul-osc)}
+  .modo span.n{font-weight:700;color:var(--azul);white-space:nowrap}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .chip{border:1.5px solid var(--borde);background:var(--tarjeta);color:var(--texto);border-radius:999px;
+        padding:8px 14px;font-size:.92rem;cursor:pointer}
+  .chip:hover{border-color:var(--azul);color:var(--azul)}
+  .record{margin-top:14px;font-size:.92rem}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.9rem;margin-bottom:8px}
+  .tema{background:var(--amarillo-cl);color:var(--texto);border-radius:999px;padding:3px 10px;font-weight:600;font-size:.8rem}
+  .barra{height:8px;background:var(--celeste);border-radius:99px;overflow:hidden;margin-bottom:18px}
+  .barra i{display:block;height:100%;background:var(--azul);width:0;transition:width .3s}
+  .pregunta{font-size:1.2rem;font-weight:700;color:var(--azul-osc);margin:0 0 16px}
+  .opts{display:grid;gap:10px}
+  .opt{text-align:left;width:100%;background:var(--tarjeta);color:var(--texto);border:2px solid var(--borde);
+       border-radius:12px;padding:13px 14px;font-size:1rem;cursor:pointer;display:flex;gap:12px;align-items:flex-start}
+  .opt:hover:not(:disabled){border-color:var(--azul)}
+  .opt .letra{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;
+              background:var(--celeste);color:var(--azul-osc);font-weight:700;font-size:.85rem}
+  .opt:disabled{cursor:default}
+  .opt.ok{border-color:var(--verde);background:var(--verde-cl)} .opt.ok .letra{background:var(--verde);color:#fff}
+  .opt.mal{border-color:var(--rojo);background:var(--rojo-cl)} .opt.mal .letra{background:var(--rojo);color:#fff}
+  .feedback{margin-top:16px;border-radius:12px;padding:14px 16px;border-left:5px solid}
+  .feedback.ok{background:var(--verde-cl);border-color:var(--verde)}
+  .feedback.mal{background:var(--rojo-cl);border-color:var(--rojo)}
+  .feedback b{display:block;margin-bottom:2px}
+  .acciones{display:flex;justify-content:flex-end;margin-top:16px}
+  .resultado{text-align:center}
+  .medalla{font-size:3.4rem;line-height:1}
+  .puntaje{font-size:2.6rem;font-weight:800;color:var(--azul);margin:6px 0 0}
+  .repaso{text-align:left;margin-top:20px}
+  .repaso h3{color:var(--azul-osc);font-size:1.05rem;margin:0 0 8px}
+  .item{border:1px solid var(--borde);border-radius:10px;padding:12px 14px;margin-bottom:8px}
+  .item .q{font-weight:600}
+  .item .a{color:var(--verde);font-size:.95rem;margin-top:3px}
+  .botones{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:20px}
+  footer{max-width:720px;margin:0 auto;padding:0 16px 30px;font-size:.8rem;color:var(--suave)}
+  .oculto{display:none}
+  @media (max-width:480px){ header h1{font-size:1.35rem} .card{padding:18px} .pregunta{font-size:1.08rem} }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <small>PROVINCIA DE BUENOS AIRES</small>
+  <h1>¿Cuánto sabés de cooperadoras escolares?</h1>
+</div></header>
+
+<main>
+  <!-- INICIO -->
+  <section id="inicio" class="card">
+    <h2>¡Poné a prueba lo que sabés!</h2>
+    <p class="muted">Preguntas sobre socios, asambleas, dinero, libros y trámites de las cooperadoras bonaerenses. Después de cada respuesta te contamos por qué.</p>
+    <div class="modos">
+      <button class="modo" data-modo="rapida"><div><b>Partida rápida</b>10 preguntas al azar de todos los temas</div><span class="n">10 ▸</span></button>
+      <button class="modo" data-modo="completa"><div><b>Desafío completo</b>Todas las preguntas, para los que van en serio</div><span class="n" id="total-n">40 ▸</span></button>
+    </div>
+    <p style="margin-top:14px"><b>O elegí un tema:</b></p>
+    <div class="chips" id="chips"></div>
+    <p class="record muted" id="record"></p>
+  </section>
+
+  <!-- JUEGO -->
+  <section id="juego" class="card oculto" aria-live="polite">
+    <div class="top">
+      <span class="tema" id="tema"></span>
+      <span class="muted"><span id="num"></span> · ⭐ <span id="pts">0</span></span>
+    </div>
+    <div class="barra"><i id="barra"></i></div>
+    <p class="pregunta" id="pregunta"></p>
+    <div class="opts" id="opts"></div>
+    <div id="feedback"></div>
+    <div class="acciones"><button class="btn oculto" id="siguiente">Siguiente ▸</button></div>
+  </section>
+
+  <!-- RESULTADO -->
+  <section id="resultado" class="card resultado oculto">
+    <div class="medalla" id="medalla"></div>
+    <p class="puntaje" id="puntaje"></p>
+    <h2 id="titulo-res"></h2>
+    <p class="muted" id="texto-res"></p>
+    <div class="botones">
+      <button class="btn" id="otra">Jugar otra vez</button>
+      <button class="btn sec" id="menu">Volver al menú</button>
+    </div>
+    <div class="repaso" id="repaso"></div>
+  </section>
+</main>
+
+<footer>
+  Basado en el Decreto provincial 4767/72 (mod. 355/73), la Ley nacional 26.759 y el Manual de la Dirección de Cooperación Escolar (DGCyE).
+  Es un juego informativo: ante dudas puntuales, consultá al Consejo Escolar de tu distrito.
+</footer>
+
+<script>
+const PREGUNTAS = [
+  // LO BÁSICO
+  {t:"Lo básico", q:"¿Qué es una cooperadora escolar?",
+   o:["Una asociación sin fines de lucro de familias y vecinos que acompaña a la escuela","Una oficina del Ministerio de Educación","Una empresa que vende útiles en la escuela","El gremio de los docentes"],
+   e:"Es una asociación sin fines de lucro formada de manera voluntaria por la comunidad para mejorar las condiciones de la escuela."},
+  {t:"Lo básico", q:"¿La cooperadora puede intervenir en temas pedagógicos o de disciplina?",
+   o:["No, salvo que la escuela se lo pida expresamente","Sí, siempre que lo vote la Comisión Directiva","Sí, si lo pide la mayoría de las familias","Solo en temas de disciplina"],
+   e:"El Decreto 4767/72 establece que la cooperadora no tiene injerencia en lo técnico, administrativo o disciplinario, salvo pedido expreso."},
+  {t:"Lo básico", q:"¿Qué organismo supervisa a las cooperadoras en la Provincia?",
+   o:["La Dirección de Cooperación Escolar de la DGCyE","La Municipalidad","ARCA (ex AFIP)","La Inspección General de Justicia"],
+   e:"La Dirección de Cooperación Escolar fiscaliza su funcionamiento. En cada distrito, el contacto más cercano es el Consejo Escolar."},
+  {t:"Lo básico", q:"¿Qué decreto provincial regula a las cooperadoras bonaerenses?",
+   o:["El Decreto 4767/72","La Ley 1420","El Decreto 26.759","El Decreto 5650/90"],
+   e:"El Decreto 4767/72 (con su modificatorio 355/73). La 26.759 es la ley nacional de cooperadoras."},
+  {t:"Lo básico", q:"¿La cooperadora tiene que cubrir todo lo que le falta a la escuela?",
+   o:["No, acompaña pero no reemplaza las obligaciones del Estado","Sí, es su función principal","Sí, pero solo en arreglos edilicios","Depende de lo que diga el director"],
+   e:"La cooperadora colabora durante el ciclo lectivo, pero no tiene que cubrir las falencias que le corresponden al Estado."},
+
+  // SOCIOS
+  {t:"Socios", q:"Una familia tiene tres hijos en la escuela. ¿Cuántas cuotas tiene que pagar para asociarse?",
+   o:["Una, porque la cuota es por persona socia y no por alumno","Tres, una por cada hijo","Dos, con descuento por hermanos","Ninguna, los padres son socios automáticamente"],
+   e:"La cuota es por socio, no por alumno. Y además asociarse es voluntario."},
+  {t:"Socios", q:"¿Se puede cobrar una cuota de ingreso para asociarse?",
+   o:["No, está prohibido","Sí, si lo aprueba la asamblea","Sí, una vez por año","Solo a socios honorarios"],
+   e:"El decreto prohíbe expresamente fijar cuotas de ingreso."},
+  {t:"Socios", q:"¿Quiénes pueden votar en una asamblea?",
+   o:["Los socios activos con al menos 30 días de antigüedad","Cualquier familia de la escuela","Todos los socios, de cualquier categoría","Solo la Comisión Directiva"],
+   e:"Solo los socios activos con 30 días de antigüedad tienen voz y voto, y pueden elegir y ser elegidos."},
+  {t:"Socios", q:"¿Qué es un socio adherente?",
+   o:["Un mayor de 15 años que paga una cuota menor y tiene voz pero no voto","Un socio que paga el doble de la cuota","Un docente de la escuela","Una empresa que dona dinero"],
+   e:"Los adherentes pagan una cuota inferior a la social: pueden opinar, pero no votar."},
+  {t:"Socios", q:"¿Cuándo se deja de ser socio automáticamente?",
+   o:["Cuando se deben más de tres meses de cuota","Cuando se debe un mes","Cuando termina el ciclo lectivo","Nunca, hay que renunciar por escrito"],
+   e:"Según el manual de la Dirección de Cooperación Escolar, quien adeuda más de tres meses deja de ser socio."},
+  {t:"Socios", q:"Si alguien paga menos que la cuota fijada, ¿cómo se registra ese dinero?",
+   o:["Como donación en el Libro de Tesorería","Como cuota parcial en el Libro de Socios","No se puede aceptar","Como caja chica"],
+   e:"Quien paga menos no es socio activo: ese ingreso se anota como donación."},
+  {t:"Socios", q:"El socio es el papá. ¿Puede la mamá ir a votar en su lugar?",
+   o:["No, nadie puede hacerse representar en la asamblea","Sí, con una nota firmada","Sí, porque es la misma familia","Sí, pero solo para elegir autoridades"],
+   e:"En la asamblea nadie puede hacerse representar. Si la mamá quiere votar, tiene que ser socia ella también."},
+  {t:"Socios", q:"¿Cuándo tiene que estar abierto el registro de socios?",
+   o:["Todo el año","Solo en marzo","Solo el mes antes de la asamblea","Solo cuando lo decide la Comisión"],
+   e:"El libro de registro de socios debe estar abierto permanentemente."},
+
+  // COMISIÓN DIRECTIVA
+  {t:"Comisión Directiva", q:"¿Cuántos integrantes tiene como mínimo la Comisión Directiva?",
+   o:["8: seis titulares y dos suplentes","3: presidente, secretario y tesorero","5 titulares","12 socios"],
+   e:"Como mínimo 8 socios: presidente, secretario, tesorero, al menos 3 vocales titulares y 2 suplentes."},
+  {t:"Comisión Directiva", q:"¿Cuánto dura el mandato de la Comisión Directiva?",
+   o:["Dos años, y se renueva por mitades cada año","Un año, y se renueva entera","Cuatro años","Hasta que el director lo decida"],
+   e:"Duran dos años y la mitad se renueva cada año, así siempre queda gente con experiencia. Pueden ser reelectos."},
+  {t:"Comisión Directiva", q:"¿Pueden dos hermanos ser presidente y tesorero de la misma cooperadora?",
+   o:["No, esos cargos son incompatibles entre parientes hasta segundo grado","Sí, no hay ninguna restricción","Sí, si lo aprueba la asamblea","Solo si uno es suplente"],
+   e:"Presidente, tesorero, revisores de cuentas y asesor no pueden ser cónyuges ni parientes hasta segundo grado."},
+  {t:"Comisión Directiva", q:"Si renuncia un miembro con cargo, ¿a quién se le ofrece primero el lugar?",
+   o:["Al primer vocal titular","Al socio más antiguo","Al director de la escuela","Al primero que se ofrezca"],
+   e:"Se ofrece al 1er vocal titular; si no acepta, al 2do, y así. Si no se cubre, se llama a Asamblea Extraordinaria."},
+  {t:"Comisión Directiva", q:"¿Qué cargo escribe las actas de las reuniones?",
+   o:["El secretario o secretaria","El tesorero o tesorera","El director","Cualquier socio presente"],
+   e:"Las actas las confecciona el secretario. Si falta, se designa a otro miembro y queda asentado."},
+
+  // CONTROL Y DIRECTOR
+  {t:"Control y director", q:"¿Cómo está formada la Comisión Revisora de Cuentas?",
+   o:["Dos titulares y un suplente, y uno de los titulares es docente","Solo por el director","Por un contador externo","Por toda la Comisión Directiva"],
+   e:"Tiene 2 titulares y 1 suplente. Uno de los titulares es un docente elegido por el director."},
+  {t:"Control y director", q:"¿Cada cuánto tienen que revisar la contabilidad los revisores de cuentas?",
+   o:["Todos los meses","Una vez por año","Solo antes de la asamblea","Cuando haya una denuncia"],
+   e:"La Comisión Revisora de Cuentas supervisa la contabilidad mensualmente y asesora al tesorero."},
+  {t:"Control y director", q:"¿Qué rol tiene el director o directora en la cooperadora?",
+   o:["Es el asesor: tiene voz pero no voto","Es el presidente","Tiene voz y voto en todo","No participa"],
+   e:"Quien dirige la escuela es asesor de la cooperadora: orienta y asesora sin coartar su libertad, con voz y sin voto."},
+  {t:"Control y director", q:"Si el director no puede ir a una asamblea, ¿qué pasa?",
+   o:["La asamblea se puede hacer igual","Se suspende hasta que vuelva","Tiene que presidirla el vicedirector","Se anula todo lo que se vote"],
+   e:"La ausencia del asesor no impide la asamblea. Puede delegar en otro docente, y la escuela debe garantizar el acceso."},
+
+  // ASAMBLEAS
+  {t:"Asambleas", q:"¿Cuándo se hace la Asamblea Anual Ordinaria?",
+   o:["En la segunda quincena de mayo","En marzo, al empezar las clases","En diciembre, al terminar el año","Cuando la Comisión quiera"],
+   e:"Se hace en la segunda quincena de mayo. Solo se posterga por fuerza mayor, avisando a la Dirección de Cooperación Escolar."},
+  {t:"Asambleas", q:"¿Con cuánta anticipación se convoca la Asamblea Anual Ordinaria?",
+   o:["30 días corridos","5 días hábiles","Una semana","El mismo día"],
+   e:"Se convoca con 30 días corridos, indicando el orden del día y exhibiendo el padrón de socios."},
+  {t:"Asambleas", q:"A la hora fijada no está el 50% de los socios. ¿Qué se hace?",
+   o:["Se espera una hora y se empieza si hay el doble de miembros que la Comisión Directiva","Se suspende la asamblea","Se empieza igual con los que haya","Se vota por WhatsApp"],
+   e:"Si no hay quórum del 50%, se espera una hora y se empieza si los presentes duplican a los miembros de la Comisión Directiva."},
+  {t:"Asambleas", q:"¿Se puede tratar en la asamblea un tema que no está en el orden del día?",
+   o:["No, solo se tratan los puntos del orden del día","Sí, si lo propone un socio","Sí, al final de la asamblea","Sí, si lo aprueba el director"],
+   e:"No se puede tratar ningún asunto que se aparte del orden del día."},
+  {t:"Asambleas", q:"¿Con cuánta anticipación se convoca una Asamblea Extraordinaria?",
+   o:["Entre 5 y 15 días","30 días como mínimo","Un día","Entre 1 y 2 meses"],
+   e:"La Comisión Directiva la convoca en un plazo no menor de 5 días ni mayor de 15."},
+  {t:"Asambleas", q:"¿Qué porcentaje de socios tiene que pedirla por escrito para que se convoque una Extraordinaria?",
+   o:["Más del 10%","El 50%","El 2%","Todos los socios"],
+   e:"La piden más del 10% de los socios, dos miembros de la Comisión Directiva, o la Dirección de Cooperación Escolar."},
+  {t:"Asambleas", q:"¿Qué mayoría hace falta para modificar el estatuto?",
+   o:["Dos tercios de los socios activos","Mayoría simple","Unanimidad","Solo la firma del presidente"],
+   e:"Se trata en una Asamblea Extraordinaria solo para ese fin y se necesita la conformidad de los dos tercios."},
+  {t:"Asambleas", q:"Después de una asamblea, ¿en cuánto tiempo hay que enviar el acta a la Dirección de Cooperación Escolar?",
+   o:["Dentro de los 15 días","Dentro de los 6 meses","Al año siguiente","No hace falta enviarla"],
+   e:"El decreto pide elevar una copia del acta, rubricada y visada, dentro de los 15 días."},
+
+  // DINERO
+  {t:"Dinero", q:"¿En qué plazo se deposita en el banco el dinero que entra a la cooperadora?",
+   o:["Dentro de los 5 días hábiles","A fin de mes","Cuando se junta una suma grande","No hace falta depositarlo"],
+   e:"Todo ingreso se deposita dentro de los 5 días hábiles en la cuenta de la cooperadora (Banco Provincia, si hay sucursal)."},
+  {t:"Dinero", q:"¿Cuántas firmas hacen falta para sacar dinero de la cuenta?",
+   o:["Dos de las tres: presidente, secretario y tesorero","Solo la del tesorero","Las de toda la Comisión","La del director"],
+   e:"La cuenta está a la orden conjunta de presidente, secretario y tesorero, y se extrae con dos de esas firmas."},
+  {t:"Dinero", q:"¿Para qué se usa la caja chica?",
+   o:["Para gastos menores y urgentes, con un monto que fija la asamblea","Para guardar todo lo recaudado en efectivo","Para pagar sueldos","Para préstamos a las familias"],
+   e:"Es el único efectivo que maneja la Comisión: un vidrio roto, una cerradura, una lamparita. Lo guarda el tesorero."},
+  {t:"Dinero", q:"¿Cuándo cierra el año contable (ejercicio) de la cooperadora?",
+   o:["El 30 de abril","El 31 de diciembre","El último día de clases","El 1 de marzo"],
+   e:"El ejercicio cierra el 30 de abril, y con esos números se arma el balance para la asamblea de mayo."},
+  {t:"Dinero", q:"¿Durante cuánto tiempo hay que guardar los comprobantes de ingresos y egresos?",
+   o:["10 años","1 año","Hasta la próxima asamblea","No hace falta guardarlos"],
+   e:"Las carpetas de comprobantes se llevan por año y se conservan durante 10 años."},
+
+  // LIBROS
+  {t:"Libros", q:"¿Quién rubrica (sella y firma) los libros de la cooperadora?",
+   o:["El Consejo Escolar del distrito","Un escribano","El banco","La municipalidad"],
+   e:"Los libros deben estar foliados y rubricados por el Consejo Escolar o la Inspección de Enseñanza."},
+  {t:"Libros", q:"Si me equivoco al escribir un acta, ¿qué hago?",
+   o:["Lo aclaro en la misma acta, sin tachar","Lo tacho y escribo arriba","Arranco la hoja","Uso corrector"],
+   e:"En las actas no puede haber enmiendas ni tachaduras: el error se salva aclarándolo en la misma acta."},
+  {t:"Libros", q:"¿Puede el tesorero llevarse el Libro de Tesorería a su casa?",
+   o:["No, los libros quedan en la escuela salvo autorización de la Comisión por el tiempo indispensable","Sí, siempre","Sí, si lo pide por WhatsApp","Solo los fines de semana"],
+   e:"Libros y documentación quedan siempre en la escuela. Solo se retiran con autorización y por el tiempo indispensable."},
+  {t:"Libros", q:"¿Qué hay que hacer si se pierde o roban un libro?",
+   o:["Denuncia policial, avisar al Consejo Escolar y abrir libros nuevos rubricados","Nada, se sigue en un cuaderno","Comprar otro y copiar lo que se recuerde","Esperar a la próxima asamblea"],
+   e:"Se hace la denuncia, se lleva copia al Consejo Escolar y se abren libros nuevos rubricados."},
+
+  // TRÁMITES
+  {t:"Trámites", q:"¿Cuál es el primer paso para crear una cooperadora?",
+   o:["Una Asamblea Constitutiva convocada por la dirección de la escuela","Sacar el CUIT","Abrir una cuenta en el banco","Comprar los libros"],
+   e:"Todo empieza con la Asamblea Constitutiva, donde se elige una comisión provisoria."},
+  {t:"Trámites", q:"¿Cuándo hay que hacer una reorganización de la cooperadora?",
+   o:["Cuando se deben las presentaciones de tres períodos o más","Cada cinco años","Cuando cambia el director","Cuando lo pide un socio"],
+   e:"Si se adeudan tres o más períodos, el asesor encabeza la reorganización: libros, socios, padrón y asamblea extraordinaria."},
+  {t:"Trámites", q:"¿Cómo saca el CUIT una cooperadora bonaerense?",
+   o:["Por un trámite simplificado: la Dirección de Cooperación Escolar envía la información a ARCA","Yendo sola a ARCA con un contador","No necesita CUIT","Lo tramita el banco"],
+   e:"Un convenio permite tramitar el CUIT y los cambios de datos a través de la Dirección de Cooperación Escolar."},
+  {t:"Trámites", q:"¿Cuánto puede durar como máximo la intervención de una cooperadora?",
+   o:["180 días","30 días","Dos años","Sin límite"],
+   e:"La intervención dura como máximo 180 días y termina con una asamblea para elegir una nueva Comisión."},
+  {t:"Trámites", q:"Si la escuela cierra, ¿qué pasa con la cooperadora?",
+   o:["Se disuelve y entrega documentación, bienes y fondos al Consejo Escolar","Sigue funcionando sola","Se reparte el dinero entre los socios","Se muda a otra escuela"],
+   e:"Se hace una asamblea disolutoria con inventario y balance final, y en 15 días todo se entrega al Consejo Escolar."}
+];
+
+const $ = id => document.getElementById(id);
+const LETRAS = ["A","B","C","D"];
+let ronda = [], i = 0, puntos = 0, errores = [], modoActual = null;
+
+const mezclar = a => { a = a.slice(); for (let k = a.length - 1; k > 0; k--) { const j = Math.floor(Math.random() * (k + 1)); [a[k], a[j]] = [a[j], a[k]]; } return a; };
+const leerRecord = () => { try { return JSON.parse(localStorage.getItem("coop-record") || "null"); } catch (e) { return null; } };
+const guardarRecord = r => { try { localStorage.setItem("coop-record", JSON.stringify(r)); } catch (e) {} };
+
+function mostrar(id){ ["inicio","juego","resultado"].forEach(s => $(s).classList.toggle("oculto", s !== id)); window.scrollTo({top:0, behavior:"smooth"}); }
+
+function pintarInicio(){
+  $("total-n").textContent = PREGUNTAS.length + " ▸";
+  const temas = [...new Set(PREGUNTAS.map(p => p.t))];
+  $("chips").innerHTML = "";
+  temas.forEach(t => {
+    const b = document.createElement("button");
+    b.className = "chip";
+    b.textContent = `${t} (${PREGUNTAS.filter(p => p.t === t).length})`;
+    b.onclick = () => empezar({tipo:"tema", tema:t});
+    $("chips").appendChild(b);
+  });
+  const r = leerRecord();
+  $("record").textContent = r ? `🏆 Tu mejor resultado: ${r.pct}% (${r.ok}/${r.total})` : "";
+}
+
+function empezar(modo){
+  modoActual = modo;
+  let base = PREGUNTAS;
+  if (modo.tipo === "tema") base = PREGUNTAS.filter(p => p.t === modo.tema);
+  ronda = mezclar(base);
+  if (modo.tipo === "rapida") ronda = ronda.slice(0, 10);
+  i = 0; puntos = 0; errores = [];
+  mostrar("juego");
+  pintarPregunta();
+}
+
+function pintarPregunta(){
+  const p = ronda[i];
+  $("tema").textContent = p.t;
+  $("num").textContent = `Pregunta ${i + 1} de ${ronda.length}`;
+  $("pts").textContent = puntos;
+  $("barra").style.width = (i / ronda.length * 100) + "%";
+  $("pregunta").textContent = p.q;
+  $("feedback").innerHTML = "";
+  $("siguiente").classList.add("oculto");
+  const opciones = mezclar(p.o.map((txt, idx) => ({txt, correcta: idx === 0})));
+  $("opts").innerHTML = "";
+  opciones.forEach((op, k) => {
+    const b = document.createElement("button");
+    b.className = "opt";
+    b.innerHTML = `<span class="letra">${LETRAS[k]}</span><span></span>`;
+    b.lastChild.textContent = op.txt;
+    b.dataset.ok = op.correcta ? "1" : "0";
+    b.onclick = () => responder(b);
+    $("opts").appendChild(b);
+  });
+  $("opts").firstChild.focus({preventScroll:true});
+}
+
+function responder(btn){
+  const p = ronda[i];
+  const ok = btn.dataset.ok === "1";
+  [...$("opts").children].forEach(b => {
+    b.disabled = true;
+    if (b.dataset.ok === "1") b.classList.add("ok");
+  });
+  if (ok) puntos++; else { btn.classList.add("mal"); errores.push(p); }
+  $("pts").textContent = puntos;
+  const fb = document.createElement("div");
+  fb.className = "feedback " + (ok ? "ok" : "mal");
+  fb.innerHTML = `<b>${ok ? elegir(["¡Correcto! 🎉","¡Muy bien! 👏","¡Exacto! ✅"]) : "No es esa 🙈"}</b><span></span>`;
+  fb.lastChild.textContent = p.e;
+  $("feedback").appendChild(fb);
+  const sig = $("siguiente");
+  sig.textContent = i === ronda.length - 1 ? "Ver resultado ▸" : "Siguiente ▸";
+  sig.classList.remove("oculto");
+  sig.focus({preventScroll:true});
+  fb.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+
+const elegir = a => a[Math.floor(Math.random() * a.length)];
+
+$("siguiente").onclick = () => {
+  i++;
+  if (i < ronda.length) pintarPregunta(); else terminar();
+};
+
+function terminar(){
+  $("barra").style.width = "100%";
+  const total = ronda.length, pct = Math.round(puntos / total * 100);
+  let medalla, titulo, texto;
+  if (pct === 100){ medalla="🏆"; titulo="¡Experta/o en cooperadoras!"; texto="Respondiste todo bien. Ya podés asesorar a la Comisión Directiva."; }
+  else if (pct >= 80){ medalla="🥇"; titulo="¡Excelente!"; texto="Sabés muchísimo. Repasá los detalles que se te escaparon."; }
+  else if (pct >= 60){ medalla="🥈"; titulo="¡Muy bien!"; texto="Tenés una buena base. Con un repaso llegás a lo más alto."; }
+  else if (pct >= 40){ medalla="🥉"; titulo="¡Buen comienzo!"; texto="Vas por buen camino. Mirá el repaso de abajo y probá de nuevo."; }
+  else { medalla="📚"; titulo="¡A repasar!"; texto="No pasa nada: para eso está el juego. Leé las respuestas y volvé a intentarlo."; }
+  $("medalla").textContent = medalla;
+  $("puntaje").textContent = `${puntos}/${total}`;
+  $("titulo-res").textContent = titulo;
+  $("texto-res").textContent = `${pct}% de respuestas correctas. ${texto}`;
+
+  const r = leerRecord();
+  if (!r || pct > r.pct || (pct === r.pct && total > r.total)) {
+    guardarRecord({pct, ok:puntos, total});
+    if (r) $("texto-res").textContent += " ¡Nuevo récord! 🎊";
+  }
+
+  const rep = $("repaso");
+  rep.innerHTML = "";
+  if (errores.length){
+    const h = document.createElement("h3");
+    h.textContent = "Para repasar";
+    rep.appendChild(h);
+    errores.forEach(p => {
+      const d = document.createElement("div");
+      d.className = "item";
+      d.innerHTML = `<div class="q"></div><div class="a"></div><div class="muted" style="font-size:.9rem;margin-top:3px"></div>`;
+      d.children[0].textContent = p.q;
+      d.children[1].textContent = "✔ " + p.o[0];
+      d.children[2].textContent = p.e;
+      rep.appendChild(d);
+    });
+  }
+  mostrar("resultado");
+}
+
+document.querySelectorAll(".modo").forEach(b => b.onclick = () => empezar({tipo:b.dataset.modo}));
+$("otra").onclick = () => empezar(modoActual);
+$("menu").onclick = () => { pintarInicio(); mostrar("inicio"); };
+pintarInicio();
+</script>
+</body>
+</html>
